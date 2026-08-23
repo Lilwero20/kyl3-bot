@@ -1,5 +1,5 @@
 import { Command } from '../../structures/Command';
-import { SlashCommandBuilder, type ChatInputCommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, type ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { errorEmbed, successEmbed } from '../../utils/embed';
 import { resolveMessage } from '../../utils/messages';
 import { emojiKeyFromString, reactionKeyFromEmoji } from '../../automation/ReactionRoleService';
@@ -36,11 +36,13 @@ export default class ReactCommand extends Command {
     const emoji = interaction.options.getString('emoji', true);
     const action = interaction.options.getString('action') ?? 'add';
 
+    // Respond immediately so the interaction doesn't expire while we search.
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
     const target = await resolveMessage(interaction, messageId);
     if (!target) {
-      await interaction.reply({
+      await interaction.editReply({
         embeds: [errorEmbed('I could not find that message in this server (check the message ID).')],
-        ephemeral: true,
       });
       return;
     }
@@ -50,18 +52,14 @@ export default class ReactCommand extends Command {
         (r) => emojiKeyFromString(emoji) === reactionKeyFromEmoji(r.emoji)
       );
       if (!reaction) {
-        await interaction.reply({
+        await interaction.editReply({
           embeds: [errorEmbed('That reaction is not on the message.')],
-          ephemeral: true,
         });
         return;
       }
-      await reaction.remove().catch(() => {
-        /* ignore */
-      });
-      await interaction.reply({
+      await reaction.remove().catch(() => null);
+      await interaction.editReply({
         embeds: [successEmbed(`Removed ${emoji} from message \`${messageId}\`.`)],
-        ephemeral: true,
       });
       return;
     }
@@ -69,15 +67,13 @@ export default class ReactCommand extends Command {
     try {
       await target.react(emoji);
     } catch {
-      await interaction.reply({
+      await interaction.editReply({
         embeds: [errorEmbed('Could not add the reaction (check the emoji is valid).')],
-        ephemeral: true,
       });
       return;
     }
-    await interaction.reply({
+    await interaction.editReply({
       embeds: [successEmbed(`Added ${emoji} to message \`${messageId}\`.`)],
-      ephemeral: true,
     });
   }
 }

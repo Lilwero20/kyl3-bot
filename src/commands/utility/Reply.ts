@@ -1,5 +1,5 @@
 import { Command } from '../../structures/Command';
-import { SlashCommandBuilder, type ChatInputCommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, type ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { errorEmbed, successEmbed } from '../../utils/embed';
 import { resolveMessage } from '../../utils/messages';
 
@@ -36,22 +36,34 @@ export default class ReplyCommand extends Command {
     const emoji = interaction.options.getString('emoji');
     const mention = interaction.options.getBoolean('mention') ?? false;
 
+    // Respond immediately so the interaction doesn't expire while we search.
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
     const target = await resolveMessage(interaction, messageId);
     if (!target) {
-      await interaction.reply({
+      await interaction.editReply({
         embeds: [errorEmbed('I could not find that message in this server (check the message ID).')],
-        ephemeral: true,
       });
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
-    const msg = await target.reply({
-      content: text,
-      allowedMentions: { parse: mention ? ['users'] : [] },
-    });
-    if (emoji) {
-      await msg.react(emoji).catch(() => null);
+    let replied = false;
+    try {
+      const msg = await target.reply({
+        content: text,
+        allowedMentions: { parse: mention ? ['users'] : [] },
+      });
+      replied = true;
+      if (emoji) await msg.react(emoji).catch(() => null);
+    } catch {
+      /* handled below */
+    }
+
+    if (!replied) {
+      await interaction.editReply({
+        embeds: [errorEmbed('I could not reply to that message (it may have been deleted).')],
+      });
+      return;
     }
 
     await interaction.editReply({
