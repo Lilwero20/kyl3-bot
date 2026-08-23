@@ -22,6 +22,9 @@ export default class SayEmbedCommand extends Command {
       o.setName('thumbnail').setDescription('Image URL for the thumbnail')
     )
     .addStringOption((o) => o.setName('image').setDescription('Image URL'))
+    .addStringOption((o) =>
+      o.setName('emoji').setDescription('Emoji to add as a reaction on the sent message')
+    )
     .addBooleanOption((o) =>
       o.setName('silent').setDescription('Send without "Sent by" footer').setRequired(false)
     );
@@ -43,6 +46,7 @@ export default class SayEmbedCommand extends Command {
     const footer = interaction.options.getString('footer');
     const thumbnail = interaction.options.getString('thumbnail');
     const image = interaction.options.getString('image');
+    const emoji = interaction.options.getString('emoji');
 
     const color = colorRaw ? parseColor(colorRaw) : undefined;
     const e = embed({
@@ -63,7 +67,8 @@ export default class SayEmbedCommand extends Command {
 
     await interaction.reply({ content: 'Sent!', ephemeral: true });
     if (interaction.channel && interaction.channel.isSendable()) {
-      await interaction.channel.send({ embeds: [e] });
+      const sent = await interaction.channel.send({ embeds: [e] });
+      if (emoji) await sent.react(emoji).catch(() => null);
     }
   }
 

@@ -19,6 +19,9 @@ export default class SayCommand extends Command {
     .addStringOption((o) =>
       o.setName('image').setDescription('Image URL to embed alongside the text')
     )
+    .addStringOption((o) =>
+      o.setName('emoji').setDescription('Emoji to add as a reaction on the sent message')
+    )
     .addBooleanOption((o) =>
       o.setName('silent').setDescription('Send without the "Sent by" footer').setRequired(false)
     );
@@ -37,13 +40,15 @@ export default class SayCommand extends Command {
     const text = interaction.options.getString('text', true);
     const attachment = interaction.options.getAttachment('attachment');
     const image = interaction.options.getString('image');
+    const emoji = interaction.options.getString('emoji');
     const silent = interaction.options.getBoolean('silent') ?? false;
 
     await interaction.reply({ content: 'Sent!', ephemeral: true });
     if (!interaction.channel || !interaction.channel.isSendable()) return;
 
+    let sent: Message | undefined;
     if (attachment) {
-      await interaction.channel.send({ content: text, files: [attachment] });
+      sent = await interaction.channel.send({ content: text, files: [attachment] });
     } else if (image) {
       const footer = silent ? undefined : `Sent by ${interaction.user.tag}`;
       const e = embed({
@@ -54,9 +59,12 @@ export default class SayCommand extends Command {
       if (footer) {
         e.setFooter({ text: footer, iconURL: interaction.user.displayAvatarURL() });
       }
-      await interaction.channel.send({ embeds: [e] });
+      sent = await interaction.channel.send({ embeds: [e] });
     } else {
-      await interaction.channel.send(text);
+      sent = await interaction.channel.send(text);
+    }
+    if (emoji && sent) {
+      await sent.react(emoji).catch(() => null);
     }
   }
 
