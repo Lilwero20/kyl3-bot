@@ -2,7 +2,7 @@ import { Command } from '../../structures/Command';
 import { SlashCommandBuilder, type ChatInputCommandInteraction, type Message } from 'discord.js';
 import { embed, EMBED_COLORS } from '../../utils/embed';
 import type { CommandCategory } from '../../structures/Command';
-import type { Kyl3Client } from '../../structures/Kyl3Client';
+import type { OpenCodeClient } from '../../structures/OpenCodeClient';
 
 export default class HelpCommand extends Command {
   public readonly data = new SlashCommandBuilder()
@@ -30,7 +30,7 @@ export default class HelpCommand extends Command {
   }
 
   private buildEmbed(interaction: ChatInputCommandInteraction, category?: string) {
-    const all = [...(interaction.client as Kyl3Client).commands.commands.values()];
+    const all = [...(interaction.client as OpenCodeClient).commands.commands.values()];
 
     const categories: CommandCategory[] = ['Utility', 'Moderation', 'AutoMod', 'Automation', 'Owner'];
 

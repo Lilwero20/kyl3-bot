@@ -1,10 +1,10 @@
 import type { ChatInputCommandInteraction } from 'discord.js';
-import type { Kyl3Client } from '../structures/Kyl3Client';
+import type { OpenCodeClient } from '../structures/OpenCodeClient';
 import { errorEmbed } from '../utils/embed';
 import { logger } from '../utils/logger';
 
 export async function onInteractionCreate(
-  client: Kyl3Client,
+  client: OpenCodeClient,
   interaction: ChatInputCommandInteraction
 ): Promise<void> {
   if (!interaction.isChatInputCommand()) return;

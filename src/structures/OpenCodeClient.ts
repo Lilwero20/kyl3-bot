@@ -3,7 +3,7 @@ import { CommandLoader } from './CommandLoader';
 import { logger } from '../utils/logger';
 import { config } from '../config';
 
-export class Kyl3Client extends Client {
+export class OpenCodeClient extends Client {
   public readonly commands = new CommandLoader();
   public readonly cooldowns = new Collection<string, number>();
 
@@ -29,6 +29,7 @@ export class Kyl3Client extends Client {
         Partials.Channel,
         Partials.GuildMember,
         Partials.Message,
+        Partials.Reaction,
         Partials.User,
       ],
     });

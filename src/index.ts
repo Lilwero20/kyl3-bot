@@ -1,4 +1,4 @@
-import { Kyl3Client } from './structures/Kyl3Client';
+import { OpenCodeClient } from './structures/OpenCodeClient';
 import { config } from './config';
 import { logger } from './utils/logger';
 import { onReady } from './events/Ready';
@@ -7,12 +7,14 @@ import { onMessageCreate } from './events/MessageCreate';
 import { onGuildMemberAdd } from './events/GuildMemberAdd';
 import { onGuildMemberRemove } from './events/GuildMemberRemove';
 import { onMessageDelete } from './events/MessageDelete';
+import { onMessageReactionAdd } from './events/MessageReactionAdd';
+import { onMessageReactionRemove } from './events/MessageReactionRemove';
 import { ReminderService } from './automation/ReminderService';
 import { SchedulerService } from './automation/SchedulerService';
 import type { Interaction } from 'discord.js';
 
 async function main(): Promise<void> {
-  const client = new Kyl3Client();
+  const client = new OpenCodeClient();
 
   // Load commands
   client.commands.load();
@@ -26,6 +28,8 @@ async function main(): Promise<void> {
   client.on('guildMemberAdd', (m) => onGuildMemberAdd(client, m));
   client.on('guildMemberRemove', (m) => onGuildMemberRemove(client, m));
   client.on('messageDelete', (m) => onMessageDelete(client, m));
+  client.on('messageReactionAdd', (r, u) => onMessageReactionAdd(client, r, u));
+  client.on('messageReactionRemove', (r, u) => onMessageReactionRemove(client, r, u));
 
   // Start services
   const reminders = new ReminderService();

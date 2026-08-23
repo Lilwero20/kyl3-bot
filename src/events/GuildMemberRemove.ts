@@ -1,10 +1,10 @@
 import type { GuildMember, PartialGuildMember } from 'discord.js';
-import type { Kyl3Client } from '../structures/Kyl3Client';
+import type { OpenCodeClient } from '../structures/OpenCodeClient';
 import { handleMemberLeave } from '../automation/WelcomeService';
 import { logger } from '../utils/logger';
 
 export async function onGuildMemberRemove(
-  client: Kyl3Client,
+  client: OpenCodeClient,
   member: GuildMember | PartialGuildMember
 ): Promise<void> {
   if (member.partial) {

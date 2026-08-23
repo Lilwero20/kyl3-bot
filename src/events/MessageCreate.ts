@@ -1,5 +1,5 @@
 import type { Message } from 'discord.js';
-import type { Kyl3Client } from '../structures/Kyl3Client';
+import type { OpenCodeClient } from '../structures/OpenCodeClient';
 import { config } from '../config';
 import { store } from '../utils/store';
 import { processAntiSpam } from '../automod/AntiSpam';
@@ -13,7 +13,7 @@ interface AfkData {
   guildId: string;
 }
 
-export async function onMessageCreate(client: Kyl3Client, message: Message): Promise<void> {
+export async function onMessageCreate(client: OpenCodeClient, message: Message): Promise<void> {
   if (message.author.bot || !message.guild) return;
 
   // Clear AFK status when the user speaks again

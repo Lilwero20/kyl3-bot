@@ -1,9 +1,9 @@
 import { ActivityType } from 'discord.js';
-import type { Kyl3Client } from '../structures/Kyl3Client';
+import type { OpenCodeClient } from '../structures/OpenCodeClient';
 import { logger } from '../utils/logger';
 import { config } from '../config';
 
-export async function onReady(client: Kyl3Client): Promise<void> {
+export async function onReady(client: OpenCodeClient): Promise<void> {
   logger.info(`Logged in as ${client.user?.tag} (${client.user?.id})`);
   logger.info(`Serving ${client.guilds.cache.size} guild(s)`);
 

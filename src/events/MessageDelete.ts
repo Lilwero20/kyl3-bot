@@ -1,9 +1,9 @@
 import type { Message, PartialMessage } from 'discord.js';
-import type { Kyl3Client } from '../structures/Kyl3Client';
+import type { OpenCodeClient } from '../structures/OpenCodeClient';
 import { store } from '../utils/store';
 
 export async function onMessageDelete(
-  client: Kyl3Client,
+  client: OpenCodeClient,
   message: Message | PartialMessage
 ): Promise<void> {
   if (message.partial) return;

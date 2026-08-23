@@ -1,7 +1,7 @@
 {
-  "name": "kyl3-bot",
+  "name": "opencode-bot",
   "version": "1.0.0",
-  "description": "A full-featured Discord bot with utility commands, moderation, auto-mod and automations.",
+  "description": "A full-featured Discord bot with utility commands, moderation, auto-mod, automations, reaction roles and status tracking.",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",

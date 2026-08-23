@@ -1,6 +1,6 @@
-# Kyl3 Bot — Setup & Usage Tutorial
+# OpenCode Bot — Setup & Usage Tutorial
 
-A full-featured Discord bot (TypeScript, discord.js 14) with utility commands, moderation, auto-mod and automations.
+A full-featured Discord bot (TypeScript, discord.js 14) with utility commands, moderation, auto-mod, automations, reaction roles and status tracking.
 
 ---
 
@@ -73,7 +73,7 @@ npm run build && npm start    # production
 You should see:
 
 ```
-[INFO] Logged in as Kyl3Bot#1234 (1234567890)
+[INFO] Logged in as OpenCodeBot#1234 (1234567890)
 [INFO] Serving 1 guild(s)
 [INFO] Registered 26 slash commands.
 ```
@@ -85,9 +85,13 @@ You should see:
 | `/help` | List every command |
 | `/ping` | Latency check |
 | `/say text:hello` | Bot says "hello" |
+| `/say text:hello attachment:<image>` | Bot says "hello" with an image attached |
 | `/sayembed description:hello` | Sends an embed |
 | `/userinfo` | Your user info |
 | `/serverinfo` | Server info |
+| `/servericon` | Server icon |
+| `/roles` | List server roles |
+| `/emojis` | List server emojis |
 | `/poll question:... option1:... option2:...` | Reaction poll |
 | `/remindme time:10m text:...` | Set a reminder |
 
@@ -128,6 +132,31 @@ If `DEV_GUILD_ID` is set, slash commands appear in your server within seconds. O
 
 Welcome templates support placeholders: `{user}`, `{userMention}`, `{server}`, `{memberCount}`.
 
+### Reaction roles (self-assign roles by reacting)
+
+```
+/reactroles create title:"Notification Roles" description:"React to pick your pings."   # post a panel
+/reactroles add message_id:<id> emoji:📢 role:@Ping Announcement                         # attach a role
+/reactroles add message_id:<id> emoji:🎉 role:@Ping Giveaway
+/reactroles list                                             # list all panels
+/reactroles remove message_id:<id> emoji:📢                 # remove a role mapping
+/reactroles delete message_id:<id>                           # delete a panel
+```
+
+Members react to the panel to toggle their role off/on. The embed lists every emoji ⇄ role pair.
+
+### System status / update tracker
+
+```
+/status channel channel:#status            # set the default announcement channel
+/status set status:Operational message:"All systems up!" notify_role:@Ping Status   # post an update
+/status set status:Maintenance message:"Scheduled maintenance."
+/status current        # show current status
+/status history        # recent status updates
+```
+
+`/status set` posts a "System Status Update" embed (pinging the optional role), records the change, and keeps a history across the values **Operational / Maintenance / Degraded Performance / Offline**.
+
 ## 10. Prefix (text) commands
 
 All slash commands also work with the prefix, e.g. `!say hello`, `!poll ...`, `!clear 10`, `!warn @user reason`. Set `ENABLE_PREFIX=false` in `.env` to disable them.
@@ -152,14 +181,14 @@ src/
 ├─ index.ts                  # entry point, event wiring
 ├─ config.ts                 # env settings
 ├─ commands/                 # one file per command
-│  ├─ utility/               # say, sayembed, ping, poll, ...
-│  ├─ moderation/            # ban, kick, mute, warn, ...
+│  ├─ utility/               # say, sayembed, ping, poll, roles, emojis, ...
+│  ├─ moderation/            # ban, kick, mute, warn, slowmode, setnick, lock, ...
 │  ├─ automod/               # /automod setup
-│  ├─ automation/            # welcome, autorole, schedule, logging
+│  ├─ automation/            # welcome, autorole, reactroles, status, schedule, logging
 │  └─ owner/                 # /eval
 ├─ automod/                  # anti-spam + keyword filter engines
-├─ automation/               # reminder + scheduler services
-├─ events/                   # message / join / leave / delete handlers
+├─ automation/               # reminder, scheduler, reaction-role + status services
+├─ events/                   # message / join / leave / delete / reaction handlers
 ├─ structures/               # command framework, client
 └─ utils/                    # embed helpers, JSON store, logger
 ```
