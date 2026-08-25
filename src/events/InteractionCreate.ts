@@ -25,16 +25,28 @@ function installDeferSafety(interaction: ChatInputCommandInteraction): NodeJS.Ti
   const originalReply = interaction.reply.bind(interaction);
   const originalDeferReply = interaction.deferReply.bind(interaction);
 
-  anyInteraction.reply = (opts: any) =>
-    interaction.deferred ? anyInteraction.editReply(opts) : originalReply(opts);
+  // `interaction.deferred`/`interaction.replied` only flip AFTER the HTTP call
+  // resolves. On a slow connection the reply POST can still be in flight when the
+  // 2.5s fallback fires, so both race — whoever lands first acks the interaction
+  // and the other gets 10062 ("Unknown interaction"). Track acknowledgement
+  // synchronously to make the fallback defer a no-op once a reply is attempted.
+  let acked = false;
 
-  anyInteraction.deferReply = (opts?: any) =>
-    interaction.deferred || interaction.replied
-      ? Promise.resolve()
-      : originalDeferReply(opts);
+  anyInteraction.reply = (opts: any) => {
+    acked = true;
+    return interaction.deferred || interaction.replied
+      ? anyInteraction.editReply(opts)
+      : originalReply(opts);
+  };
+
+  anyInteraction.deferReply = (opts?: any) => {
+    if (acked || interaction.deferred || interaction.replied) return Promise.resolve();
+    acked = true;
+    return originalDeferReply(opts);
+  };
 
   return setTimeout(async () => {
-    if (!interaction.replied && !interaction.deferred) {
+    if (!acked) {
       try {
         await originalDeferReply();
       } catch {

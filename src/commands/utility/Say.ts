@@ -43,7 +43,7 @@ export default class SayCommand extends Command {
     const emoji = interaction.options.getString('emoji');
     const silent = interaction.options.getBoolean('silent') ?? false;
 
-    await interaction.reply({ content: 'Sent!', ephemeral: true });
+    await interaction.reply({ content: 'Sent!', flags: 64 }); // Ephemeral
     if (!interaction.channel || !interaction.channel.isSendable()) return;
 
     let sent: Message | undefined;
