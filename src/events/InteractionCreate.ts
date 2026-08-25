@@ -25,10 +25,10 @@ function installDeferSafety(interaction: ChatInputCommandInteraction): NodeJS.Ti
   const originalReply = interaction.reply.bind(interaction);
   const originalDeferReply = interaction.deferReply.bind(interaction);
 
-  anyInteraction.reply = (opts: unknown) =>
+  anyInteraction.reply = (opts: any) =>
     interaction.deferred ? anyInteraction.editReply(opts) : originalReply(opts);
 
-  anyInteraction.deferReply = (opts?: unknown) =>
+  anyInteraction.deferReply = (opts?: any) =>
     interaction.deferred || interaction.replied
       ? Promise.resolve()
       : originalDeferReply(opts);
